@@ -12,17 +12,18 @@ var battleStart = false;
 var vector;
 var distance;
 
-//x, y, diameter, speed, is spawned
+//x, y, diameter, speed, is spawned, color, health, point
 var allEnemyDatabase = [
-    [0, 0, 30, 1.75, 1],   //basic enemy
-    [0, 0, 10, 3, 1]       //speedy enemy
+    [0, 0, 40, 1.75, 1, "#ffa600", 100, 10],   //basic enemy
+    [0, 0, 20, 3, 1, "#f5f05d", 50, 15],       //speedy enemy
+    [0, 0, 60, 1, 1, "#ff0000", 200, 50]       //boss enemy
 ];
 var allEnemy = [
-    [0, 0, 1, 0, 0], 
-    [0, 0, 1, 0, 0], 
-    [0, 0, 1, 0, 0], 
-    [0, 0, 1, 0, 0], 
-    [0, 0, 1, 0, 0]
+    [0, 0, 1, 0, 0, "", 0, 0], 
+    [0, 0, 1, 0, 0, "", 0, 0], 
+    [0, 0, 1, 0, 0, "", 0, 0], 
+    [0, 0, 1, 0, 0, "", 0, 0], 
+    [0, 0, 1, 0, 0, "", 0, 0]
 ];
 var enemyIndex = 0;
 var enemyHit;
@@ -43,7 +44,23 @@ var accuracyMultiplier = 100;
 var accuracyIncrease = 0;
 var accuracyDecrease = 0;
 
-var enemyFight = [["Move 1", 10], ["Move 2", 0]];
+var enemyFightFunction = [enemyBasicMove, enemySpeedyMove, enemyBossMove];
+var enemyFight = [
+    [
+        ["Slash", 10], 
+        ["Sharpen", 0]
+    ], 
+    [
+        ["Quick Attack", 30], 
+        ["Sharpen", 0]
+    ], 
+    [
+        ["Bonk", 30], 
+        ["Big Bonk", 50], 
+        ["Snap", 25],
+        ["Pray", 50]
+    ]
+];
 var enemyDamageMultiplier;
 
 var objectX = canvasWidth/2;

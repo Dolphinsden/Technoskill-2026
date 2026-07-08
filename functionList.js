@@ -9,22 +9,20 @@ function character() {
 }
 
 function spawnEnemy(id) {
-    console.log("spawnEnemy called with id:", id, "database length:", allEnemyDatabase.length);
     let x = random((allEnemyDatabase[id][2])/2, canvasWidth - (allEnemyDatabase[id][2])/2);
     let y = random((allEnemyDatabase[id][2])/2, canvasHeight - (allEnemyDatabase[id][2])/2);
     
     if (checkCollision(x, y, allEnemyDatabase[id][2])) {
-        console.log("enemy not collided");
         for (let i = 0; i < allEnemy.length; i++) {
             if (allEnemy[i][4] == 0) {
-                console.log("Slot not taken");
                 allEnemy[i][0] = x;
                 allEnemy[i][1] = y;
-                allEnemy[i][2] = allEnemyDatabase[id][2];
-                allEnemy[i][3] = allEnemyDatabase[id][3];
-                allEnemy[i][4] = allEnemyDatabase[id][4];
 
-                fill("#f5f05d");
+                for (let j = 2; j < allEnemyDatabase[id].length; j++) {
+                    allEnemy[i][j] = allEnemyDatabase[id][j];
+                }
+
+                fill(allEnemy[i][5]);
                 stroke("#000000");
                 strokeWeight(allEnemy[id][2]*0.03);
                 circle(allEnemy[id][0], allEnemy[id][1], allEnemy[id][2]);
@@ -33,14 +31,9 @@ function spawnEnemy(id) {
                     
                 enemyCount++;
                 lastEnemySpawned = millis();
-                console.log("spawned with diameter of " + allEnemy[i][2]);
                 break;
-            } else {
-                console.log("already taken");
             }
         }
-    } else {
-        console.log("collided");
     }
 }
 
@@ -97,7 +90,7 @@ function followPlayer() {
                 if (vector.y <= -1) allEnemy[i][1] -= allEnemy[i][3];
             }
 
-            fill("#f5f05d");
+            fill(allEnemy[i][5]);
             stroke("#000000");
             strokeWeight(allEnemy[i][2]*0.03);
             circle(allEnemy[i][0], allEnemy[i][1], allEnemy[i][2]);
@@ -190,6 +183,7 @@ function makeButton(x, y, index) {
 function fight() {
     enemyHealthBar();
     characterHealthBar();
+    characterManaBar();
     
     if (characterTurn) {
         fightBox();
@@ -272,13 +266,15 @@ function fightBox() {
 
                 //text
                 textBoxEvent(buttonFightText, fightX[kolom], fightY, counter);
+
                 counter++;
             }
         }
+        noStroke();
     } else {
         if (timer - millis() < -1500) {
             if (animationDone) {
-                gamePoint++;
+                gamePoint += allEnemy[enemyHit][7];
                 animationDone = true;
                 characterTurn = false;
                 resetGame();
@@ -354,14 +350,14 @@ function useMegaPunch(whichMove) {
     noFill();
 }
 
-function enemyMove() {
-    //enemy damage
+function enemyBasicMove() {
+    //basic enemy
     let index = floor(random(0, 2));
 
     if (characterCurrentHealth > 0) {
         accuracyCheck(random(0, 100), 100 - accuracyDecrease);
         if (hit) {
-            if (enemyFight[index][1] > 0) {
+            if (enemyFight[enemyIndex][index][1] > 0) {
                 let damage = enemyFight[index][1]*(enemyDamageMultiplier/100);
                 characterCurrentHealth -= damage;
 
@@ -370,7 +366,7 @@ function enemyMove() {
                 textAlign(CENTER, CENTER);
                 textSize(40);
                 textStyle(BOLD);
-                text(enemyFight[index][0] + " landed! Enemy dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                text(enemyFight[enemyIndex][index][0] + " landed! Enemy dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
                 noFill();
             } else {
                 enemyDamageMultiplier += 25;
@@ -380,7 +376,7 @@ function enemyMove() {
                 textAlign(CENTER, CENTER);
                 textSize(40);
                 textStyle(BOLD);
-                text(enemyFight[index][0] + " landed! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                text(enemyFight[enemyIndex][index][0] + " landed! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
                 noFill();
             }
         } else {
@@ -399,12 +395,126 @@ function enemyMove() {
     }
 }
 
+function enemySpeedyMove() {
+    //speedy enemy
+    let index = floor(random(0, 2));
+
+    if (characterCurrentHealth > 0) {
+        accuracyCheck(random(0, 100), 100 - accuracyDecrease);
+        if (hit) {
+            if (enemyFight[enemyIndex][index][1] > 0) {
+                let damage = enemyFight[enemyIndex][index][1]*(enemyDamageMultiplier/100);
+                characterCurrentHealth -= damage;
+
+                bottomBox();
+                fill("#000000");
+                textAlign(CENTER, CENTER);
+                textSize(40);
+                textStyle(BOLD);
+                text(enemyFight[enemyIndex][index][0] + " landed! Enemy dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                noFill();
+            } else {
+                enemyDamageMultiplier += 25;
+
+                bottomBox();
+                fill("#000000");
+                textAlign(CENTER, CENTER);
+                textSize(40);
+                textStyle(BOLD);
+                text(enemyFight[enemyIndex][index][0] + " landed! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                noFill();
+            }
+        } else {
+            bottomBox();
+            fill("#000000");
+            textAlign(CENTER, CENTER);
+            textSize(40);
+            textStyle(BOLD);
+            text("Enemy move missed!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+            noFill();
+        }
+        
+        timer = millis();
+        animationDone = false;
+        characterTurn = true;
+    }
+}
+
+function enemyBossMove() {
+    //basic enemy
+    let index = floor(random(0, 3));
+
+    if (characterCurrentHealth > 0) {
+        if (enemyCurrentHealth > allEnemyDatabase[enemyIndex][6]/2) {
+            accuracyCheck(random(0, 100), 100 - accuracyDecrease);
+            if (hit) {
+                if (index < 2) {
+                    let damage = enemyFight[enemyIndex][index][1]*(enemyDamageMultiplier/100);
+                    characterCurrentHealth -= damage;
+
+                    bottomBox();
+                    fill("#000000");
+                    textAlign(CENTER, CENTER);
+                    textSize(40);
+                    textStyle(BOLD);
+                    text(enemyFight[enemyIndex][index][0] + " landed! Enemy dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                    noFill();
+                } else {
+                    enemyDamageMultiplier += enemyFight[enemyIndex][index][1];
+                    damageMultiplier += enemyFight[enemyIndex][index][1];
+
+                    bottomBox();
+                    fill("#000000");
+                    textAlign(CENTER, CENTER);
+                    textSize(40);
+                    textStyle(BOLD);
+                    text("The boss is mad! Damage dealt and damage taken is increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                    noFill();
+                }
+            } else {
+                bottomBox();
+                fill("#000000");
+                textAlign(CENTER, CENTER);
+                textSize(40);
+                textStyle(BOLD);
+                text("Enemy move missed!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                noFill();
+            }
+        } else {
+            let heal = allEnemyDatabase[enemyIndex][6]*(enemyFight[enemyIndex][3][1]/100);
+            enemyCurrentHealth += heal;
+
+            bottomBox();
+            fill("#000000");
+            textAlign(CENTER, CENTER);
+            textSize(40);
+            textStyle(BOLD);
+            text("The boss prayed to his deity! Healed by " + heal + "!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+            noFill();
+        }
+
+        timer = millis();
+        animationDone = false;
+        characterTurn = true;
+        
+    }
+}
+
+function enemyMove() {
+    //enemy damage
+    for (let i = 0; i < enemyFight.length; i++) {
+        if (enemyIndex == i) {
+            enemyFightFunction[i]();
+        }
+    }
+}
+
 function battleStartSetup() {
     //start of battle
     damageMultiplier = 100;
     accuracyMultiplier = 100;
 
-    enemyCurrentHealth = 100;
+    enemyCurrentHealth = allEnemy[enemyHit][6];
     enemyDamageMultiplier = 100;
 
     battleStart = true;
@@ -430,11 +540,18 @@ function enemyHealthBar() {
     noFill();
     noStroke();
 
+    fill(allEnemy[enemyHit][5]);
+    stroke("#000000");
+    strokeWeight(allEnemy[enemyHit][2]*0.03);
+    circle(canvasWidth*0.75, canvasHeight*0.3, allEnemy[enemyHit][2]*2);
+    noStroke();
+    noFill();
+
     if (enemyCurrentHealth > 0) {
         stroke("#000000");
         strokeWeight(2);
         fill("#28ff36");
-        rect(buttonGap, buttonGap, constrain(healthBarWidth*(enemyCurrentHealth/enemyHealth), 0, healthBarWidth), buttonGap, 10, 10, 10, 10);
+        rect(buttonGap, buttonGap, constrain(healthBarWidth*(enemyCurrentHealth/allEnemyDatabase[enemyIndex][6]), 0, healthBarWidth), buttonGap, 10, 10, 10, 10);
         noFill();
         noStroke();
     }
@@ -460,10 +577,31 @@ function characterHealthBar() {
     }
 }
 
+function characterManaBar() {
+    let manaBarWidth = (0 - (canvasWidth - buttonGap*4 - buttonW*2))*0.75;
+
+    stroke("#000000");
+    strokeWeight(2);
+    fill("#ffffff");
+    rect(canvasWidth - buttonGap, canvasHeight - buttonGap*6 - buttonH*2, manaBarWidth, buttonGap*0.75, 10, 10, 10, 10);
+    noFill();
+    noStroke();
+
+    if (characterCurrentMana > 0) {
+        stroke("#000000");
+        strokeWeight(2);
+        fill("#008cff");
+        rect(canvasWidth - buttonGap, canvasHeight - buttonGap*6 - buttonH*2, constrain(manaBarWidth*(characterCurrentMana/characterMana), manaBarWidth, 0), buttonGap*0.75, 10, 10, 10, 10);
+        noFill();
+        noStroke();
+    }
+}
+
 /* ===== Item ===== */
 function item() {
     enemyHealthBar();
     characterHealthBar();
+    characterManaBar();
 
     if (characterTurn) {
         itemBox();
@@ -605,6 +743,7 @@ function skill() {
     //skill
     enemyHealthBar();
     characterHealthBar();
+    characterManaBar();
 
     if (characterTurn) {
         skillBox();
@@ -649,7 +788,7 @@ function skillBox() {
                         mouseIsPressed = false;
                         whichSKill = counter;
 
-                        if (characterCurrentMana > skillStat[whichSKill][0]) {
+                        if (characterCurrentMana > skillStat[whichSKill][0] || whichSKill == 2) {
                             skillFunction[whichSKill]();
 
                             if (bellyDrumFail) {
@@ -690,10 +829,10 @@ function skillBox() {
             }
         }
         noStroke();
-    }  else {
+    } else {
         if (timer - millis() < -1500) {
             if (animationDone) {
-                gamePoint++;
+                gamePoint += allEnemy[enemyHit][7];
                 animationDone = true;
                 characterTurn = false;
                 resetGame();
@@ -777,6 +916,7 @@ function useExplosion() {
     //explosion
     let damage = (skillStat[whichSKill][1])*(damageMultiplier/100) + damageIncrease;
     enemyCurrentHealth -= damage;
+    characterCurrentMana -= skillStat[whichSKill][0];
 
     bottomBox();
     fill("#000000");
