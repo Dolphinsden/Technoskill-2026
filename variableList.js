@@ -9,10 +9,11 @@ var timer = 0;
 var animationDone = false;
 var battleStart = false;
 
-var speedEnemy = 1;
-var enemyX = 50;
-var enemyY = 50;
-var enemyDiameter = 20;
+var speedEnemy = 1.75;
+var enemyX = 0;
+var enemyY = 0;
+var enemyDiameter = 30;
+var enemySpawned = false;
 
 var characterTurn = true;
 
@@ -29,8 +30,8 @@ var accuracyDecrease = 0;
 var enemyFight = [["Move 1", 10], ["Move 2", 0]];
 var enemyDamageMultiplier;
 
-var objectX = 300;
-var objectY = 200;
+var objectX = canvasWidth/2;
+var objectY = canvasHeight/2;
 var objectDiameter = 50;
 
 var speedCharacter = 5;

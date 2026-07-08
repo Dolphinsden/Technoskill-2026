@@ -1,5 +1,7 @@
 function preload() {
     fightBackground = loadImage('fightBackground.jpeg');
+    adventureBackground = loadImage('stoneWallBackground.png');
+    wallTile = loadImage('stoneWallTile.png');
 }
 
 function setup() {
@@ -8,7 +10,30 @@ function setup() {
 }
 
 function draw() {
-    if (checkCollision() <= 0) {
+    if (checkCollision() > 0) {
+        //adventure
+        image(adventureBackground, 0, 0, canvasWidth, canvasHeight);
+
+        fill("#ffffff");
+        textAlign(LEFT, CENTER);
+        textSize(20);
+        textStyle(BOLD);
+        text("Current points: " + gamePoint, 10, 20);
+        noFill();
+
+        if (mouseIsPressed) {
+            shoot();
+        }
+        character();
+        move();
+
+        if (enemySpawned) {
+            followPlayer();
+        } else {
+            spawnEnemy();
+        }
+    } else {
+        //encounter
         if (state == 0) {
             //menu
             image(fightBackground, 0, 0, canvasWidth, canvasHeight);
@@ -38,24 +63,5 @@ function draw() {
         } else if (state == 3) {
             skill();
         }
-    } else {
-        //adventure
-        background("#000000");
-
-        fill("#ffffff");
-        textAlign(LEFT, CENTER);
-        textSize(20);
-        textStyle(BOLD);
-        text("Current points: " + gamePoint, 10, 20);
-        noFill();
-
-        if (mouseIsPressed) {
-            shoot();
-        }
-        character();
-        move();
-
-        spawnEnemy();
-        followPlayer();
     }
 }
