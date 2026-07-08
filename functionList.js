@@ -172,12 +172,12 @@ function fight() {
 
 function fightBox() {
     if (enemyCurrentHealth > 0) {
-        let counter = 0;
+        counter = 0;
 
         let fightX = [buttonFightGap, buttonFightGap*2 + buttonFightW];
         
         hit = false;
-        let whichMove;
+        whichMove;
 
         if (animationDone) {
             bottomBox();
@@ -208,47 +208,7 @@ function fightBox() {
                         accuracyCheck(random(0, 100), moveStat[whichMove][0]*(accuracyMultiplier/100) + accuracyIncrease);
                         if (hit) {
                             //hit
-                            if (moveStat[whichMove][1] > 0) { //attack
-                                let damage = (moveStat[whichMove][1])*(damageMultiplier/100) + damageIncrease;
-                                enemyCurrentHealth -= damage;
-
-                                bottomBox();
-                                fill("#000000");
-                                textAlign(CENTER, CENTER);
-                                textSize(40);
-                                textStyle(BOLD);
-                                text(buttonFightText[whichMove] + " landed! Dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
-                                noFill();
-                            } else { //status
-                                switch (whichMove) {
-                                    case 1:
-                                        damageMultiplier += 25;
-
-                                        bottomBox();
-                                        fill("#000000");
-                                        textAlign(CENTER, CENTER);
-                                        textSize(40);
-                                        textStyle(BOLD);
-                                        text(buttonFightText[whichMove] + " landed! Damage dealt is increased by 25%!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
-                                        noFill();
-
-                                        break;
-                                    
-                                    case 2:
-                                        accuracyMultiplier += 20;
-
-                                        bottomBox();
-                                        fill("#000000");
-                                        textAlign(CENTER, CENTER);
-                                        textSize(40);
-                                        textStyle(BOLD);
-                                        text(buttonFightText[whichMove] + " landed! Accuracy is increased by 20%!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
-                                        noFill();
-
-                                        break;
-
-                                }
-                            }
+                            buttonFightFunction[whichMove](whichMove);
 
                             if (enemyCurrentHealth <= 0) {
                                 animationDone = false;
@@ -306,6 +266,60 @@ function fightBox() {
             }
         }
     }
+}
+
+function usePunch(whichMove) {
+    //punch
+    let damage = (moveStat[whichMove][1])*(damageMultiplier/100) + damageIncrease;
+    enemyCurrentHealth -= damage;
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("Punch landed! Dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
+}
+
+function useBulkUp(whichMove) {
+    //bulk up
+    damageMultiplier += 20;
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("You used bulk up! Damage dealt is increased by 20%!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
+}
+
+function useFocus(whichMove) {
+    //focus
+    accuracyMultiplier += 20;
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("You locked in! Accuracy is increased by 20%!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
+}
+
+function useMegaPunch(whichMove) {
+    //mega punch
+    let damage = (moveStat[whichMove][1])*(damageMultiplier/100) + damageIncrease;
+    enemyCurrentHealth -= damage;
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("Mega punch landed! Dealt " + damage + " damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
 }
 
 function enemyMove() {
@@ -441,7 +455,7 @@ function itemBox() {
     stroke("#000000");
     strokeWeight(2);
 
-    let whichItem;
+    whichItem;
     
     for (let baris = 0; baris < 2; baris++) {
         if (timer - millis() >= -1500) {
@@ -573,6 +587,7 @@ function skill() {
 
 function skillBox() {
     counter = 0;
+    bellyDrumFail = false;
 
     if (animationDone) {
         bottomBox();
@@ -580,8 +595,6 @@ function skillBox() {
 
     stroke("#000000");
     strokeWeight(2);
-
-    let whichItem;
     
     for (let baris = 0; baris < 2; baris++) {
         if (timer - millis() >= -1500) {
@@ -601,7 +614,28 @@ function skillBox() {
                 fill("#d8d8d8");
                 if (mouseIsPressed) {
                     mouseIsPressed = false;
-                    whichItem = counter;
+                    whichSKill = counter;
+
+                    if (characterCurrentMana > skillStat[whichSKill][0]) {
+                        skillFunction[whichSKill]();
+
+                        if (bellyDrumFail) {
+                            break;
+                        }
+                    } else {
+                        //not enough
+                        bottomBox();
+                        fill("#000000");
+                        textAlign(CENTER, CENTER);
+                        textSize(40);
+                        textStyle(BOLD);
+                        text("You don't have enough mana!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                        noFill();
+
+                        timer = millis();
+                        animationDone = false;
+                        break;
+                    }
 
                     timer = millis();
                     animationDone = false;
@@ -618,11 +652,83 @@ function skillBox() {
             noFill();
 
             //text
-            textBoxEvent(itemsName, fightX[kolom], fightY, counter);
+            textBoxEvent(skillName, fightX[kolom], fightY, counter);
             counter++;
         }
     }
     noStroke();
+}
+
+function useFireball() {
+    //fireball
+    let damage = (skillStat[whichSKill][1])*(damageMultiplier/100) + damageIncrease;
+    enemyCurrentHealth -= damage;
+    characterCurrentMana -= skillStat[whichSKill][0];
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("You use fireball! Dealt " + damage +" damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
+}
+
+function useLightFoot() {
+    //light foot
+    accuracyDecrease -= skillStat[whichSKill][1];
+    characterCurrentMana -= skillStat[whichSKill][0];
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("You danced around, the enemy is confused! Enemy accuracy is reduced by " + skillStat[whichSKill][1] + " !", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
+}
+
+function useBellyDrum() {
+    //belly drum
+    damageMultiplier += skillStat[whichSKill][1];
+
+    if (characterCurrentHealth > characterHealth*0.5) {
+        characterCurrentHealth -= characterHealth*0.5;
+
+        bottomBox();
+        fill("#000000");
+        textAlign(CENTER, CENTER);
+        textSize(40);
+        textStyle(BOLD);
+        text("You beat your belly to the rythm of a drum! Damage is increased by " + skillStat[whichSKill][1] + "%!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+        noFill();
+    } else {
+        bottomBox();
+        fill("#000000");
+        textAlign(CENTER, CENTER);
+        textSize(40);
+        textStyle(BOLD);
+        text("You don't have enough HP!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+        noFill();
+
+        timer = millis();
+        animationDone = false;
+        bellyDrumFail = true;
+    }
+}
+
+function useExplosion() {
+    //explosion
+    let damage = (skillStat[whichSKill][1])*(damageMultiplier/100) + damageIncrease;
+    enemyCurrentHealth -= damage;
+
+    bottomBox();
+    fill("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(40);
+    textStyle(BOLD);
+    text("You use explosion Dealt " + damage +" damage!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+    noFill();
 }
 
 /* ===== Run ===== */
