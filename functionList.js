@@ -1,18 +1,36 @@
 /* ===== Adventure ===== */
 function character() {
     fill("#1e17e3");
+    stroke("#000000");
+    strokeWeight(objectDiameter*0.03);
     circle(objectX, objectY, objectDiameter);
+    noStroke();
     noFill();
 }
 
 function spawnEnemy() {
-    fill("#f5f05d");
-    circle(enemyX, enemyY, enemyDiameter); 
-    noFill();
+    enemyX = random(enemyDiameter/2, canvasWidth - enemyDiameter/2);
+    enemyY = random(enemyDiameter/2, canvasHeight - enemyDiameter/2);
+
+    if (checkCollision() > 50) {
+        fill("#f5f05d");
+        stroke("#000000");
+        strokeWeight(enemyDiameter*0.03);
+        circle(enemyX, enemyY, enemyDiameter);
+        noStroke();
+        noFill();
+
+        console.log("Enemy Spawned");
+
+        enemySpawned = true;
+    } else {
+        console.log("Enemy not spawned");
+        enemySpawned = false;
+    }
 }
 
 function checkCollision() {
-    var vector = getDirectionVector();
+    var vector = getDirectionVector(objectX, objectY, enemyX, enemyY);
     var distance = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y)) - (objectDiameter/2 + enemyDiameter/2);
 
     return(distance);
@@ -24,8 +42,8 @@ function move() {
     if (keyIsDown(87)) objectY -= speedCharacter; //w
     if (keyIsDown(83)) objectY += speedCharacter; //s
 
-    objectX = constrain(objectX, objectDiameter/2, width - objectDiameter/2);
-    objectY = constrain(objectY, objectDiameter/2, height - objectDiameter/2);
+    objectX = constrain(objectX, objectDiameter/2, canvasWidth - objectDiameter/2);
+    objectY = constrain(objectY, objectDiameter/2, canvasHeight - objectDiameter/2);
 }
 
 function shoot() {
@@ -33,20 +51,32 @@ function shoot() {
 }
 
 function followPlayer() {
-    var vector = getDirectionVector();
+    var vector = getDirectionVector(objectX, objectY, enemyX, enemyY);
     //Speed vaires depending on distance
-    //enemyX += ((vector.x)/200);
-    //enemyY += ((vector.y)/200);
+    /*enemyX += ((vector.x)/200);
+    enemyY += ((vector.y)/200);*/
 
     //Constant Speed
-    if (vector.x > 0) enemyX += speedEnemy;
-    if (vector.x < 0) enemyX -= speedEnemy;
-    if (vector.y > 0) enemyY += speedEnemy;
-    if (vector.y < 0) enemyY -= speedEnemy;
+    if (vector.x != 0) {
+        if (vector.x >= 1) enemyX += speedEnemy;
+        if (vector.x <= -1) enemyX -= speedEnemy;
+    }
+    
+    if (vector.y != 0) {
+        if (vector.y >= 1) enemyY += speedEnemy;
+        if (vector.y <= -1) enemyY -= speedEnemy;
+    }
+
+    fill("#f5f05d");
+    stroke("#000000");
+    strokeWeight(enemyDiameter*0.03);
+    circle(enemyX, enemyY, enemyDiameter);
+    noStroke();
+    noFill();
 }
 
-function getDirectionVector() {
-    return(createVector((objectX - enemyX), (objectY - enemyY)));
+function getDirectionVector(objectX, objectY, targetX, targetY) {
+    return(createVector((objectX - targetX), (objectY - targetY)));
 }
 
 /* ===== Menu ===== */
@@ -365,12 +395,12 @@ function enemyHealthBar() {
 }
 
 function characterHealthBar() {
-    let healthBarWidth = canvasWidth - buttonGap*4 - buttonW*2
+    let healthBarWidth = 0 - (canvasWidth - buttonGap*4 - buttonW*2);
 
     stroke("#000000");
     strokeWeight(2);
     fill("#a10000");
-    rect(canvasWidth - buttonGap - healthBarWidth, canvasHeight - buttonGap*5 - buttonH*2, healthBarWidth, buttonGap, 10, 10, 10, 10);
+    rect(canvasWidth - buttonGap, canvasHeight - buttonGap*5 - buttonH*2, healthBarWidth, buttonGap, 10, 10, 10, 10);
     noFill();
     noStroke();
 
@@ -378,7 +408,7 @@ function characterHealthBar() {
         stroke("#000000");
         strokeWeight(2);
         fill("#28ff36");
-        rect(canvasWidth - buttonGap - healthBarWidth, canvasHeight - buttonGap*5 - buttonH*2, constrain(healthBarWidth*(characterCurrentHealth/characterHealth), 0, healthBarWidth), buttonGap, 10, 10, 10, 10);
+        rect(canvasWidth - buttonGap, canvasHeight - buttonGap*5 - buttonH*2, constrain(healthBarWidth*(characterCurrentHealth/characterHealth), healthBarWidth, 0), buttonGap, 10, 10, 10, 10);
         noFill();
         noStroke();
     }
@@ -527,22 +557,85 @@ function useItemSmokeBomb() {
 /* ===== Skill ===== */
 function skill() {
     //skill
-    state = 0;
+    enemyHealthBar();
+    characterHealthBar();
+
+    if (characterTurn) {
+        skillBox();
+    } else {
+        if (animationDone) {
+            enemyMove();
+        } else {
+            skillBox();
+        }
+    }
+}
+
+function skillBox() {
+    counter = 0;
+
+    if (animationDone) {
+        bottomBox();
+    }
+
+    stroke("#000000");
+    strokeWeight(2);
+
+    let whichItem;
+    
+    for (let baris = 0; baris < 2; baris++) {
+        if (timer - millis() >= -1500) {
+            break;
+        } else {
+            animationDone = true;
+        }
+
+        timer = 0;
+
+        let fightX = [buttonFightGap, buttonFightGap*2 + buttonFightW];
+
+        for (let kolom = 0; kolom < 2; kolom++) {
+            let fightY = (canvasHeight - buttonGap*2 - buttonH*2) + baris*(buttonH + buttonGap) - buttonGap/2;
+
+            if (mouseX > fightX[kolom] && mouseX < fightX[kolom] + buttonFightW  && mouseY > fightY && mouseY < fightY + buttonFightH) {
+                fill("#d8d8d8");
+                if (mouseIsPressed) {
+                    mouseIsPressed = false;
+                    whichItem = counter;
+
+                    timer = millis();
+                    animationDone = false;
+                    characterTurn = false;
+
+                    state = 3;
+                    break;
+                    }
+            } else {
+                fill("#ffffff");
+            }
+
+            rect(fightX[kolom], fightY, buttonFightW, buttonFightH, 10, 10, 10, 10);
+            noFill();
+
+            //text
+            textBoxEvent(itemsName, fightX[kolom], fightY, counter);
+            counter++;
+        }
+    }
+    noStroke();
 }
 
 /* ===== Run ===== */
 function resetGame() {
-    enemyX = 50;
-    enemyY = 50;
-
-    objectX = 300;
-    objectY = 200;
+    enemyX = 0;
+    enemyY = 0;
 
     distance = 0;
     state = 0;
 
     enemySummoned = false;
     battleStart = false;
+    enemySpawned = false;
 }
 
 function doubleClicked() {
