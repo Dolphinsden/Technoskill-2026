@@ -9,11 +9,27 @@ var timer = 0;
 var animationDone = false;
 var battleStart = false;
 
-var speedEnemy = 1.75;
-var enemyX = 0;
-var enemyY = 0;
-var enemyDiameter = 30;
-var enemySpawned = false;
+var vector;
+var distance;
+
+//x, y, diameter, speed, is spawned
+var allEnemyDatabase = [
+    [0, 0, 30, 1.75, 1],   //basic enemy
+    [0, 0, 10, 3, 1]       //speedy enemy
+];
+var allEnemy = [
+    [0, 0, 1, 0, 0], 
+    [0, 0, 1, 0, 0], 
+    [0, 0, 1, 0, 0], 
+    [0, 0, 1, 0, 0], 
+    [0, 0, 1, 0, 0]
+];
+var enemyIndex = 0;
+var enemyHit;
+
+var enemyCount = 0;
+var lastEnemySpawned = 0;
+var enemySpawnedInterval = 5000; //5 seconds
 
 var characterTurn = true;
 
