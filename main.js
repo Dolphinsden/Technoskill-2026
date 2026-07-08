@@ -11,29 +11,7 @@ function setup() {
 }
 
 function draw() {
-    if (checkCollision() > 0) {
-        //adventure
-        image(adventureBackground, 0, 0, canvasWidth, canvasHeight);
-
-        fill("#ffffff");
-        textAlign(LEFT, CENTER);
-        textSize(20);
-        textStyle(BOLD);
-        text("Current points: " + gamePoint, 10, 20);
-        noFill();
-
-        if (mouseIsPressed) {
-            shoot();
-        }
-        character();
-        move();
-
-        if (enemySpawned) {
-            followPlayer();
-        } else {
-            spawnEnemy();
-        }
-    } else {
+    if (anyCollision()) {
         //encounter
         if (state == 0) {
             //menu
@@ -64,5 +42,31 @@ function draw() {
         } else if (state == 3) {
             skill();
         }
+    } else {
+        //adventure
+        image(adventureBackground, 0, 0, canvasWidth, canvasHeight);
+
+        if (mouseIsPressed) {
+            shoot();
+        }
+
+        character();
+        move();
+
+        fill("#ffffff");
+        textAlign(LEFT, CENTER);
+        textSize(20);
+        textStyle(BOLD);
+        text("Current points: " + gamePoint, 10, 20);
+        noFill();
+
+        if (enemyCount < 5) {
+            if (millis() - lastEnemySpawned >= enemySpawnedInterval) {
+                enemyIndex = round(random(0, allEnemyDatabase.length - 1));
+                spawnEnemy(enemyIndex);
+            }
+        }
+
+        followPlayer();
     }
 }

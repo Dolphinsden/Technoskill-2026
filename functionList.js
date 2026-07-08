@@ -8,32 +8,63 @@ function character() {
     noFill();
 }
 
-function spawnEnemy() {
-    enemyX = random(enemyDiameter/2, canvasWidth - enemyDiameter/2);
-    enemyY = random(enemyDiameter/2, canvasHeight - enemyDiameter/2);
+function spawnEnemy(id) {
+    console.log("spawnEnemy called with id:", id, "database length:", allEnemyDatabase.length);
+    let x = random((allEnemyDatabase[id][2])/2, canvasWidth - (allEnemyDatabase[id][2])/2);
+    let y = random((allEnemyDatabase[id][2])/2, canvasHeight - (allEnemyDatabase[id][2])/2);
+    
+    if (checkCollision(x, y, allEnemyDatabase[id][2])) {
+        console.log("enemy not collided");
+        for (let i = 0; i < allEnemy.length; i++) {
+            if (allEnemy[i][4] == 0) {
+                console.log("Slot not taken");
+                allEnemy[i][0] = x;
+                allEnemy[i][1] = y;
+                allEnemy[i][2] = allEnemyDatabase[id][2];
+                allEnemy[i][3] = allEnemyDatabase[id][3];
+                allEnemy[i][4] = allEnemyDatabase[id][4];
 
-    if (checkCollision() > 50) {
-        fill("#f5f05d");
-        stroke("#000000");
-        strokeWeight(enemyDiameter*0.03);
-        circle(enemyX, enemyY, enemyDiameter);
-        noStroke();
-        noFill();
-
-        console.log("Enemy Spawned");
-
-        enemySpawned = true;
+                fill("#f5f05d");
+                stroke("#000000");
+                strokeWeight(allEnemy[id][2]*0.03);
+                circle(allEnemy[id][0], allEnemy[id][1], allEnemy[id][2]);
+                noStroke();
+                noFill();
+                    
+                enemyCount++;
+                lastEnemySpawned = millis();
+                console.log("spawned with diameter of " + allEnemy[i][2]);
+                break;
+            } else {
+                console.log("already taken");
+            }
+        }
     } else {
-        console.log("Enemy not spawned");
-        enemySpawned = false;
+        console.log("collided");
     }
 }
 
-function checkCollision() {
-    var vector = getDirectionVector(objectX, objectY, enemyX, enemyY);
-    var distance = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y)) - (objectDiameter/2 + enemyDiameter/2);
+function anyCollision() {
+    if (enemyCount == 0) {
+        return false;
+    }
 
-    return(distance);
+    for (let i = 0; i < allEnemy.length; i++) {
+        if (allEnemy[i][4] == 1) {
+            if (checkCollision(allEnemy[i][0], allEnemy[i][1], allEnemy[i][2]) == false) {
+                enemyHit = i;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function checkCollision(targetX, targetY, targetDiameter) {
+    vector = getDirectionVector(objectX, objectY, targetX, targetY);
+    distance = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y)) - (objectDiameter/2 + targetDiameter/2);
+
+    return(distance >= 0);
 }
 
 function move() {
@@ -51,28 +82,29 @@ function shoot() {
 }
 
 function followPlayer() {
-    var vector = getDirectionVector(objectX, objectY, enemyX, enemyY);
-    //Speed vaires depending on distance
-    /*enemyX += ((vector.x)/200);
-    enemyY += ((vector.y)/200);*/
-
     //Constant Speed
-    if (vector.x != 0) {
-        if (vector.x >= 1) enemyX += speedEnemy;
-        if (vector.x <= -1) enemyX -= speedEnemy;
-    }
-    
-    if (vector.y != 0) {
-        if (vector.y >= 1) enemyY += speedEnemy;
-        if (vector.y <= -1) enemyY -= speedEnemy;
-    }
+    for (let i = 0; i < allEnemy.length - 1; i++) {
+        if (allEnemy[i][4] == 1) {
+            var vector = getDirectionVector(objectX, objectY, allEnemy[i][0], allEnemy[i][1]);
 
-    fill("#f5f05d");
-    stroke("#000000");
-    strokeWeight(enemyDiameter*0.03);
-    circle(enemyX, enemyY, enemyDiameter);
-    noStroke();
-    noFill();
+            if (vector.x != 0) {
+                if (vector.x >= 1) allEnemy[i][0] += allEnemy[i][3];
+                if (vector.x <= -1) allEnemy[i][0] -= allEnemy[i][3];
+            }
+            
+            if (vector.y != 0) {
+                if (vector.y >= 1) allEnemy[i][1] += allEnemy[i][3];
+                if (vector.y <= -1) allEnemy[i][1] -= allEnemy[i][3];
+            }
+
+            fill("#f5f05d");
+            stroke("#000000");
+            strokeWeight(allEnemy[i][2]*0.03);
+            circle(allEnemy[i][0], allEnemy[i][1], allEnemy[i][2]);
+            noStroke();
+            noFill();
+        }
+    }
 }
 
 function getDirectionVector(objectX, objectY, targetX, targetY) {
@@ -586,77 +618,101 @@ function skill() {
 }
 
 function skillBox() {
-    counter = 0;
-    bellyDrumFail = false;
+    if (enemyCurrentHealth > 0) {
+        counter = 0;
+        bellyDrumFail = false;
 
-    if (animationDone) {
-        bottomBox();
-    }
-
-    stroke("#000000");
-    strokeWeight(2);
-    
-    for (let baris = 0; baris < 2; baris++) {
-        if (timer - millis() >= -1500) {
-            break;
-        } else {
-            animationDone = true;
+        if (animationDone) {
+            bottomBox();
         }
 
-        timer = 0;
+        stroke("#000000");
+        strokeWeight(2);
+        
+        for (let baris = 0; baris < 2; baris++) {
+            if (timer - millis() >= -1500) {
+                break;
+            } else {
+                animationDone = true;
+            }
 
-        let fightX = [buttonFightGap, buttonFightGap*2 + buttonFightW];
+            timer = 0;
 
-        for (let kolom = 0; kolom < 2; kolom++) {
-            let fightY = (canvasHeight - buttonGap*2 - buttonH*2) + baris*(buttonH + buttonGap) - buttonGap/2;
+            let fightX = [buttonFightGap, buttonFightGap*2 + buttonFightW];
 
-            if (mouseX > fightX[kolom] && mouseX < fightX[kolom] + buttonFightW  && mouseY > fightY && mouseY < fightY + buttonFightH) {
-                fill("#d8d8d8");
-                if (mouseIsPressed) {
-                    mouseIsPressed = false;
-                    whichSKill = counter;
+            for (let kolom = 0; kolom < 2; kolom++) {
+                let fightY = (canvasHeight - buttonGap*2 - buttonH*2) + baris*(buttonH + buttonGap) - buttonGap/2;
 
-                    if (characterCurrentMana > skillStat[whichSKill][0]) {
-                        skillFunction[whichSKill]();
+                if (mouseX > fightX[kolom] && mouseX < fightX[kolom] + buttonFightW  && mouseY > fightY && mouseY < fightY + buttonFightH) {
+                    fill("#d8d8d8");
+                    if (mouseIsPressed) {
+                        mouseIsPressed = false;
+                        whichSKill = counter;
 
-                        if (bellyDrumFail) {
+                        if (characterCurrentMana > skillStat[whichSKill][0]) {
+                            skillFunction[whichSKill]();
+
+                            if (bellyDrumFail) {
+                                break;
+                            }
+                        } else {
+                            //not enough
+                            bottomBox();
+                            fill("#000000");
+                            textAlign(CENTER, CENTER);
+                            textSize(40);
+                            textStyle(BOLD);
+                            text("You don't have enough mana!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                            noFill();
+
+                            timer = millis();
+                            animationDone = false;
                             break;
                         }
-                    } else {
-                        //not enough
-                        bottomBox();
-                        fill("#000000");
-                        textAlign(CENTER, CENTER);
-                        textSize(40);
-                        textStyle(BOLD);
-                        text("You don't have enough mana!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
-                        noFill();
 
                         timer = millis();
                         animationDone = false;
+                        characterTurn = false;
+
+                        state = 3;
                         break;
-                    }
+                        }
+                } else {
+                    fill("#ffffff");
+                }
 
-                    timer = millis();
-                    animationDone = false;
-                    characterTurn = false;
+                rect(fightX[kolom], fightY, buttonFightW, buttonFightH, 10, 10, 10, 10);
+                noFill();
 
-                    state = 3;
-                    break;
-                    }
-            } else {
-                fill("#ffffff");
+                //text
+                textBoxEvent(skillName, fightX[kolom], fightY, counter);
+                counter++;
             }
+        }
+        noStroke();
+    }  else {
+        if (timer - millis() < -1500) {
+            if (animationDone) {
+                gamePoint++;
+                animationDone = true;
+                characterTurn = false;
+                resetGame();
+            } else {
+                bottomBox();
+                fill("#000000");
+                textAlign(CENTER, CENTER);
+                textSize(40);
+                textStyle(BOLD);
+                text("Enemy defeated!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+                noFill();
 
-            rect(fightX[kolom], fightY, buttonFightW, buttonFightH, 10, 10, 10, 10);
-            noFill();
-
-            //text
-            textBoxEvent(skillName, fightX[kolom], fightY, counter);
-            counter++;
+                if (timer - millis() < -3000) {
+                    animationDone = true;
+                    characterTurn = true;
+                }
+            }
         }
     }
-    noStroke();
 }
 
 function useFireball() {
@@ -733,11 +789,11 @@ function useExplosion() {
 
 /* ===== Run ===== */
 function resetGame() {
-    enemyX = 0;
-    enemyY = 0;
-
+    allEnemy[enemyHit][4] = 0;
     distance = 0;
     state = 0;
+    enemyCount--;
+    lastEnemySpawned = millis();
 
     enemySummoned = false;
     battleStart = false;
