@@ -37,8 +37,15 @@ var objectDiameter = 50;
 var speedCharacter = 5;
 var characterHealth = 200;
 var characterCurrentHealth = 0;
+var characterMana = 150;
+var characterCurrentMana = 0;
 
 //button for menu
+var counter = 0;
+var whichItem = 0;
+var whichMove = 0
+var whichSKill = 0;
+
 var buttonW = canvasWidth/5;    //160
 var buttonH = canvasHeight/9; //80
 var buttonGap = buttonH/4;      //20
@@ -55,16 +62,29 @@ var buttonFightH = buttonH;                             //80
 var buttonFightGap = buttonFightH/2                     //40
 var buttonFightW = (canvasWidth - buttonFightGap*3)/2;  //320
 
-var buttonFightText = ["Move 1", "Move 2", "Move 3", "Move 4"];
+var buttonFightFunction = [usePunch, useBulkUp, useFocus, useMegaPunch];
+var buttonFightText = ["Punch", "Bulk Up", "Focus", "Mega Punch"];
+
 //accuracy, damage
 var moveStat = [
-    [100, 10],  //move 1
-    [100, 0],   //move 2
-    [80, 0],    //move 3
-    [100, 50]   //move 4
+    [100, 10],  //Punch
+    [100, 0],   //Bulk Up
+    [80, 0],    //Focus
+    [30, 50]   //Mega Punch
 ];
 var hit = false;
 
 var itemsUse = [useItemPotion, useItemCoffee, useItemStrengthPotion, useItemSmokeBomb];
 var itemsName = ["Potion", "Coffee", "Strength Potion", "Smoke Bomb"];
 var itemsAmount = [3, 3, 3, 3];
+
+var skillFunction = [useFireball, useLightFoot, useBellyDrum, useExplosion];
+var skillName = ["Fireball", "Light Foot", "Belly Drum", "Explosion"];
+//mana, stat
+var skillStat = [
+    [20, 40],   //Fireball
+    [40, 40],   //Light Foot
+    [50, 50],   //Belly Drum
+    [100, 100]  //Explosion
+];
+var bellyDrumFail = false;

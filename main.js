@@ -7,6 +7,7 @@ function preload() {
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
     characterCurrentHealth = characterHealth;
+    characterCurrentMana = characterMana;
 }
 
 function draw() {
