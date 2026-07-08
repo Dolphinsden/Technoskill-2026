@@ -365,12 +365,12 @@ function enemyHealthBar() {
 }
 
 function characterHealthBar() {
-    let healthBarWidth = canvasWidth - buttonGap*4 - buttonW*2
+    let healthBarWidth = 0 - (canvasWidth - buttonGap*4 - buttonW*2);
 
     stroke("#000000");
     strokeWeight(2);
     fill("#a10000");
-    rect(canvasWidth - buttonGap - healthBarWidth, canvasHeight - buttonGap*5 - buttonH*2, healthBarWidth, buttonGap, 10, 10, 10, 10);
+    rect(canvasWidth - buttonGap, canvasHeight - buttonGap*5 - buttonH*2, healthBarWidth, buttonGap, 10, 10, 10, 10);
     noFill();
     noStroke();
 
@@ -378,7 +378,7 @@ function characterHealthBar() {
         stroke("#000000");
         strokeWeight(2);
         fill("#28ff36");
-        rect(canvasWidth - buttonGap - healthBarWidth, canvasHeight - buttonGap*5 - buttonH*2, constrain(healthBarWidth*(characterCurrentHealth/characterHealth), 0, healthBarWidth), buttonGap, 10, 10, 10, 10);
+        rect(canvasWidth - buttonGap, canvasHeight - buttonGap*5 - buttonH*2, constrain(healthBarWidth*(characterCurrentHealth/characterHealth), healthBarWidth, 0), buttonGap, 10, 10, 10, 10);
         noFill();
         noStroke();
     }
@@ -527,7 +527,72 @@ function useItemSmokeBomb() {
 /* ===== Skill ===== */
 function skill() {
     //skill
-    state = 0;
+    enemyHealthBar();
+    characterHealthBar();
+
+    if (characterTurn) {
+        skillBox();
+    } else {
+        if (animationDone) {
+            enemyMove();
+        } else {
+            skillBox();
+        }
+    }
+}
+
+function skillBox() {
+    counter = 0;
+
+    if (animationDone) {
+        bottomBox();
+    }
+
+    stroke("#000000");
+    strokeWeight(2);
+
+    let whichItem;
+    
+    for (let baris = 0; baris < 2; baris++) {
+        if (timer - millis() >= -1500) {
+            break;
+        } else {
+            animationDone = true;
+        }
+
+        timer = 0;
+
+        let fightX = [buttonFightGap, buttonFightGap*2 + buttonFightW];
+
+        for (let kolom = 0; kolom < 2; kolom++) {
+            let fightY = (canvasHeight - buttonGap*2 - buttonH*2) + baris*(buttonH + buttonGap) - buttonGap/2;
+
+            if (mouseX > fightX[kolom] && mouseX < fightX[kolom] + buttonFightW  && mouseY > fightY && mouseY < fightY + buttonFightH) {
+                fill("#d8d8d8");
+                if (mouseIsPressed) {
+                    mouseIsPressed = false;
+                    whichItem = counter;
+
+                    timer = millis();
+                    animationDone = false;
+                    characterTurn = false;
+
+                    state = 3;
+                    break;
+                    }
+            } else {
+                fill("#ffffff");
+            }
+
+            rect(fightX[kolom], fightY, buttonFightW, buttonFightH, 10, 10, 10, 10);
+            noFill();
+
+            //text
+            textBoxEvent(itemsName, fightX[kolom], fightY, counter);
+            counter++;
+        }
+    }
+    noStroke();
 }
 
 /* ===== Run ===== */
