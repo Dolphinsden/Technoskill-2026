@@ -26,6 +26,7 @@ function draw() {
 
             enemyHealthBar();
             characterHealthBar();
+            characterManaBar();
 
             for (let baris = 0; baris < 2; baris++) {
                 for (let kolom = 0; kolom < 2; kolom++) {
