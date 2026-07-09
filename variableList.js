@@ -14,11 +14,11 @@ var battleStart = false;
 var vector;
 var distance;
 
-//x, y, diameter, speed, is spawned, color, health, point
+//x, y, diameter, speed, is spawned, color, health, point, xp
 var allEnemyDatabase = [
-    [0, 0, 40, 1.75, 1, "#ffa600", 100, 10],   //basic enemy
-    [0, 0, 20, 3, 1, "#f5f05d", 50, 15],       //speedy enemy
-    [0, 0, 60, 1, 1, "#ff0000", 200, 50]       //boss enemy
+    [0, 0, 40, 1.75, 1, "#ffa600", 100, 10, 30],   //basic enemy
+    [0, 0, 20, 3, 1, "#f5f05d", 30, 5, 15],       //speedy enemy
+    [0, 0, 60, 1, 1, "#ff0000", 200, 50, 100]       //boss enemy
 ];
 var allEnemy = [
     [0, 0, 1, 0, 0, "", 0, 0], 
@@ -32,6 +32,9 @@ var enemyHit;
 var enemyBossHealUsed = false;
 
 var currentFloor = 1;
+var characterXP = 50;
+var characterCurrentXP = 0;
+var characterLevel = 1;
 
 var enemyDropDone = false;
 //diameter, color

@@ -8,6 +8,33 @@ function character() {
     noFill();
 }
 
+function xpBar() {
+    let XPBarWidth = canvasWidth/3;
+
+    stroke("#000000");
+    strokeWeight(2);
+    fill("#ffffff");
+    rect(canvasWidth/2 - XPBarWidth/2, canvasHeight - buttonGap*3, XPBarWidth, buttonGap, 10, 10, 10, 10);
+    noFill();
+    noStroke();
+
+    fill("#ffffff");
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    textStyle(BOLD);
+    text("Character level: " + characterLevel, canvasWidth/2, canvasHeight - buttonGap*4);
+    noFill();
+
+    if (characterXP > 0) {
+        stroke("#000000");
+        strokeWeight(2);
+        fill("#28f8ff");
+        rect(canvasWidth/2 - XPBarWidth/2, canvasHeight - buttonGap*3, constrain(XPBarWidth*(characterCurrentXP/characterXP), 0, XPBarWidth), buttonGap, 10, 10, 10, 10);
+        noFill();
+        noStroke();
+    }
+}
+
 function spawnEnemy(id) {
     let x = random((allEnemyDatabase[id][2])/2, canvasWidth - (allEnemyDatabase[id][2])/2);
     let y = random((allEnemyDatabase[id][2])/2, canvasHeight - (allEnemyDatabase[id][2])/2);
@@ -70,10 +97,6 @@ function move() {
     objectY = constrain(objectY, objectDiameter/2, canvasHeight - objectDiameter/2);
 }
 
-function shoot() {
-    background("#ff0000");
-}
-
 function followPlayer() {
     //Constant Speed
     for (let i = 0; i < allEnemy.length - 1; i++) {
@@ -123,8 +146,14 @@ function itemDrops() {
 
                     if (enemyDrop[i][2] == 0) {
                         characterCurrentHealth += 50;
+                        if (characterCurrentHealth > characterHealth) {
+                            characterCurrentHealth = characterHealth;
+                        }
                     } else if (enemyDrop[i][2] == 1) {
                         characterCurrentMana += 50;
+                        if (characterCurrentMana > characterMana) {
+                            characterCurrentMana = characterMana;
+                        }
                     } else if (enemyDrop[i][2] == 2) {
                         currentFloor++;
                     }
@@ -215,11 +244,11 @@ function makeButton(x, y, index) {
 }
 
 function damageCalculation(arrayStat, which) {
-    return (arrayStat[which][1])*(damageMultiplier/100) + damageIncrease;
+    return ((arrayStat[which][1])*(damageMultiplier/100) + damageIncrease)*(1 + 0.5*(characterLevel - 1));
 }
 
 function enemyDamageCalculation(whichEnemyMove) {
-    return enemyFight[enemyIndex][whichEnemyMove][1]*(enemyDamageMultiplier/100);
+    return (enemyFight[enemyIndex][whichEnemyMove][1]*(enemyDamageMultiplier/100))*(1 + Math.pow(0.2*(characterLevel - 1), 2));
 }
 
 /* ===== Fight ===== */
@@ -374,7 +403,7 @@ function enemyBasicMove() {
 
     accuracyCheck(random(0, 100), 100 - accuracyDecrease);
     if (hit) {
-        if (enemyFight[enemyIndex][index][1] > 0) {
+        if (index == 0) {
             let damage = enemyDamageCalculation(index);
             characterCurrentHealth -= damage;
 
@@ -393,7 +422,7 @@ function enemyBasicMove() {
             textAlign(CENTER, CENTER);
             textSize(40);
             textStyle(BOLD);
-            text(enemyFight[enemyIndex][index][0] + " landed! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+            text("The enemy used " + enemyFight[enemyIndex][index][0] + "! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
             noFill();
         }
     } else {
@@ -417,7 +446,7 @@ function enemySpeedyMove() {
 
     accuracyCheck(random(0, 100), 100 - accuracyDecrease);
     if (hit) {
-        if (enemyFight[enemyIndex][index][1] > 0) {
+        if (index == 0) {
             let damage = enemyDamageCalculation(index);
             characterCurrentHealth -= damage;
 
@@ -436,7 +465,7 @@ function enemySpeedyMove() {
             textAlign(CENTER, CENTER);
             textSize(40);
             textStyle(BOLD);
-            text(enemyFight[enemyIndex][index][0] + " landed! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
+            text("The enemy used " + enemyFight[enemyIndex][index][0] + "! Enemy damage dealt increased by 25%", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
             noFill();
         }
     } else {
@@ -528,7 +557,7 @@ function battleStartSetup() {
     damageMultiplier = 100;
     accuracyMultiplier = 100;
 
-    enemyCurrentHealth = allEnemy[enemyHit][6];
+    enemyCurrentHealth = allEnemy[enemyHit][6]*(1 + Math.pow(0.2*(characterLevel - 1), 2));
     enemyDamageMultiplier = 100;
 
     battleStart = true;
@@ -590,6 +619,15 @@ function characterHealthBar() {
         noFill();
         noStroke();
     }
+
+    fill("#ffffff");
+    stroke("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(15);
+    textStyle(BOLD);
+    text("HP: " + characterCurrentHealth + "/" + characterHealth, canvasWidth + healthBarWidth, canvasHeight - buttonGap*5 - buttonH*2, -healthBarWidth, buttonGap);
+    noFill();
+    noStroke();
 }
 
 function characterManaBar() {
@@ -598,7 +636,7 @@ function characterManaBar() {
     stroke("#000000");
     strokeWeight(2);
     fill("#ffffff");
-    rect(canvasWidth - buttonGap, canvasHeight - buttonGap*6 - buttonH*2, manaBarWidth, buttonGap*0.75, 10, 10, 10, 10);
+    rect(canvasWidth - buttonGap, canvasHeight - buttonGap*6.5 - buttonH*2, manaBarWidth, buttonGap*0.85, 10, 10, 10, 10);
     noFill();
     noStroke();
 
@@ -606,10 +644,19 @@ function characterManaBar() {
         stroke("#000000");
         strokeWeight(2);
         fill("#008cff");
-        rect(canvasWidth - buttonGap, canvasHeight - buttonGap*6 - buttonH*2, constrain(manaBarWidth*(characterCurrentMana/characterMana), manaBarWidth, 0), buttonGap*0.75, 10, 10, 10, 10);
+        rect(canvasWidth - buttonGap, canvasHeight - buttonGap*6.5 - buttonH*2, constrain(manaBarWidth*(characterCurrentMana/characterMana), manaBarWidth, 0), buttonGap*0.85, 10, 10, 10, 10);
         noFill();
         noStroke();
     }
+
+    fill("#ffffff");
+    stroke("#000000");
+    textAlign(CENTER, CENTER);
+    textSize(15);
+    textStyle(BOLD);
+    text("Mana: " + characterCurrentMana + "/" + characterMana, canvasWidth + manaBarWidth, canvasHeight - buttonGap*7.5 - buttonH*2, -manaBarWidth, buttonGap*0.85);
+    noFill();
+    noStroke();
 }
 
 /* ===== Item ===== */
@@ -889,7 +936,7 @@ function useExplosion() {
     //explosion
     let damage = damageCalculation(skillStat, whichSKill);
     enemyCurrentHealth -= damage;
-    characterCurrentMana -= skillStat[whichSKill][0];
+    //characterCurrentMana -= skillStat[whichSKill][0];
 
     bottomBox();
     fill("#000000");

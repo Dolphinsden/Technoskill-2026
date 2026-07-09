@@ -11,7 +11,7 @@ function setup() {
 }
 
 function draw() {
-    if (gameStart == false) {
+    if (gameStart) {
         if (gameLose == false) {
             if (anyCollision()) {
                 if (battleStart == false) {
@@ -30,8 +30,12 @@ function draw() {
                         bottomBox();
                         if (characterTurn) {
                             if (characterCurrentHealth <= 0) {
+                                console.log("die");
                                 if (timer - millis() >= -1500) {
                                     if (animationDone) {
+                                        gameLose = true;
+                                        return;
+                                    } else {
                                         bottomBox();
                                         fill("#000000");
                                         textAlign(CENTER, CENTER);
@@ -39,11 +43,14 @@ function draw() {
                                         textStyle(BOLD);
                                         text("You died!", buttonGap/4, canvasHeight - buttonH*2 - buttonGap*3.25, canvasWidth - buttonGap/2, buttonH*2 + buttonGap*2.5);
                                         noFill();
-                                    } else {
-                                        animationDone = true;
-                                        gameLose = true;
+                                        console.log("game lose = " + gameLose);
                                     }
+                                } else {
+                                    animationDone = true;
                                 }
+
+                                timer = millis();
+                                return;
                             }
                             
                             if (state == 0) {
@@ -120,7 +127,7 @@ function draw() {
                                 enemyDrop[i][0] = allEnemy[enemyHit][0];
                                 enemyDrop[i][1] = allEnemy[enemyHit][1];
 
-                                enemyDrop[i][2] = round(random(0, enemyDropDatabase.length - 1));
+                                enemyDrop[i][2] = floor(random(0, enemyDropDatabase.length));
                                 console.log("drop id: " + enemyDrop[enemyHit][2]);
                                 enemyDrop[i][3] = 0;
                                 enemyDrop[i][4] = 1;
@@ -132,7 +139,9 @@ function draw() {
                     
                     if (timer - millis() < -1500) {
                         if (animationDone) {
-                            gamePoint += allEnemy[enemyHit][7];
+                            gamePoint += allEnemy[enemyHit][7]*(1 + 0.5*(currentFloor - 1));
+                            characterCurrentXP += allEnemy[enemyHit][8]*(1 + 0.5*(currentFloor - 1));
+
                             animationDone = true;
                             characterTurn = false;
                             resetGame();
@@ -161,11 +170,22 @@ function draw() {
                 character();
                 move();
 
+                if (characterCurrentXP >= characterXP) {
+                    characterCurrentXP -= characterXP;
+                    characterLevel++;
+                    characterXP = characterXP*(1 + Math.pow(0.3*(characterLevel - 1), 2));
+                }
+
+                xpBar();
+
                 fill("#ffffff");
+                stroke("#000000");
+                strokeWeight(2);
                 textAlign(LEFT, TOP);
                 textSize(20);
                 textStyle(BOLD);
                 text("Current points: " + gamePoint + "\nCurrent floor: " + currentFloor, 10, 10);
+                noStroke();
                 noFill();
 
                 if (enemyCount < 5) {
@@ -180,9 +200,52 @@ function draw() {
             }
         } else {
             //die
+            background("#ff0000");
+
+            fill("#ffffff");
+            stroke("#000000");
+            strokeWeight(5);
+            textAlign(CENTER, CENTER);
+            textSize(50);
+            textStyle(BOLD);
+            text("You Lose!\nScore: " + gamePoint + "\nFloor: " + currentFloor, canvasWidth/2, canvasHeight/2);
+            noStroke();
+            noFill();
         }
     } else {
         //start screen
+        background("#cecece");
+
+        fill("#ffffff");
+        stroke("#000000");
+        strokeWeight(5);
+        textAlign(CENTER, CENTER);
+        textSize(50);
+        textStyle(BOLD);
+        text("Welcome!\nClick button to start", canvasWidth/2, canvasHeight/2 - 100);
+        noStroke();
+        noFill();
+
+        if (mouseX > canvasWidth/2 - 100 && mouseX < canvasWidth/2 + 100 && mouseY > canvasHeight/2 + 50 && mouseY < canvasHeight/2 + 100) {
+            fill("#3232325f");
+            if (mouseIsPressed) {
+                mouseIsPressed = false;
+                gameStart = true;
+            }
+        } else {
+            fill("#cecece");
+        }
+        stroke("#000000");
+        strokeWeight(2);
+        rect(canvasWidth/2 - 100, canvasHeight/2 + 50, 200, 50);
+        noStroke();
+        noFill();
+
+        fill("#000000");
+        textAlign(CENTER, CENTER);
+        textSize(30);
+        textStyle(BOLD);
+        text("Start Game", canvasWidth/2 - 100, canvasHeight/2 + 50, 200, 50);
+        noFill();
     }
-    
 }
