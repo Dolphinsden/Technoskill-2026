@@ -1,7 +1,6 @@
 function preload() {
     fightBackground = loadImage('fightBackground.jpeg');
-    adventureBackground = loadImage('stoneWallBackground.png');
-    wallTile = loadImage('stoneWallTile.png');
+    adventureBackground = loadImage('forestBackground.jpg');
 }
 
 function setup() {
