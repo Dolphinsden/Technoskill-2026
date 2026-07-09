@@ -2,6 +2,8 @@ var canvasWidth = 800;  //800
 var canvasHeight = 600; //600
 
 var fightBackground;
+var gameLose = false;
+var gameStart = false;
 
 var state = 0; //0 = menu, 1 = fight, 2 = item, 3 = skill
 var gamePoint = 0;
@@ -27,6 +29,25 @@ var allEnemy = [
 ];
 var enemyIndex = 0;
 var enemyHit;
+var enemyBossHealUsed = false;
+
+var currentFloor = 1;
+
+var enemyDropDone = false;
+//diameter, color
+var enemyDropDatabase = [
+    [10, "#00ff00"],
+    [10, "#0000ff"], 
+    [30, "#756116"]
+];
+//x, y, id, is picked up, is spawned
+var enemyDrop = [
+    [0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+];
 
 var enemyCount = 0;
 var lastEnemySpawned = 0;
@@ -103,7 +124,7 @@ var moveStat = [
     [100, 10],  //Punch
     [100, 0],   //Bulk Up
     [80, 0],    //Focus
-    [30, 50]   //Mega Punch
+    [80, 30]   //Mega Punch
 ];
 var hit = false;
 
