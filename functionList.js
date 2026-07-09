@@ -936,7 +936,7 @@ function useExplosion() {
     //explosion
     let damage = damageCalculation(skillStat, whichSKill);
     enemyCurrentHealth -= damage;
-    //characterCurrentMana -= skillStat[whichSKill][0];
+    characterCurrentMana -= skillStat[whichSKill][0];
 
     bottomBox();
     fill("#000000");
