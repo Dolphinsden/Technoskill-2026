@@ -118,7 +118,6 @@ function draw() {
 
                     timer = 0
                     
-                    
                 } else {
                     if (enemyDropDone == false) {
                         for (let i = 0; i < enemyDrop.length; i++) {
