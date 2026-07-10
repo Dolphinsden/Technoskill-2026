@@ -94,7 +94,7 @@ var objectDiameter = 50;
 var speedCharacter = 5;
 var characterHealth = 200;
 var characterCurrentHealth = 0;
-var characterMana = 150;
+var characterMana = 100;
 var characterCurrentMana = 0;
 
 //button for menu
