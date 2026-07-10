@@ -55,9 +55,10 @@ function draw() {
                             if (state == 0) {
                                 //menu
 
+                                image(fightBackground, 0, 0, canvasWidth, canvasHeight);
                                 bottomBox();
                                 textBox();
-
+                                
                                 enemyHealthBar();
                                 characterHealthBar();
                                 characterManaBar();
@@ -79,11 +80,13 @@ function draw() {
                             }
                         } else {
                             if (animationDone) {
+                                image(fightBackground, 0, 0, canvasWidth, canvasHeight);
                                 enemyMove();
                             } else {
                                 if (state == 0) {
                                     //menu
 
+                                    image(fightBackground, 0, 0, canvasWidth, canvasHeight);
                                     bottomBox();
                                     textBox();
 
@@ -172,6 +175,12 @@ function draw() {
                     characterCurrentXP -= characterXP;
                     characterLevel++;
                     characterXP = characterXP*(1 + Math.pow(0.3*(characterLevel - 1), 2));
+                    
+                    characterHealth = 200 + 50*(characterLevel - 1);
+                    characterCurrentHealth = characterHealth;
+
+                    characterMana = 100 + 25*(characterLevel - 1);
+                    characterCurrentMana = characterMana;
                 }
 
                 xpBar();

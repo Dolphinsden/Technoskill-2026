@@ -140,22 +140,24 @@ function itemDrops() {
                 }
             } else {
                 if (mouseIsPressed) {
-                    background("#ff0000");
                     enemyDrop[i][3] = 1;
                     enemyDrop[i][4] = 0;
 
                     if (enemyDrop[i][2] == 0) {
-                        characterCurrentHealth += 50;
+                        characterCurrentHealth += characterHealth*0.2;
                         if (characterCurrentHealth > characterHealth) {
                             characterCurrentHealth = characterHealth;
                         }
+                        background("#00ff00");
                     } else if (enemyDrop[i][2] == 1) {
-                        characterCurrentMana += 50;
+                        characterCurrentMana += characterMana*0.2;
                         if (characterCurrentMana > characterMana) {
                             characterCurrentMana = characterMana;
                         }
+                        background("#0000ff");
                     } else if (enemyDrop[i][2] == 2) {
                         currentFloor++;
+                        background("#ff9e2f");
                     }
                     console.log("picked up");
                 }
@@ -552,8 +554,6 @@ function enemyMove() {
 
 function battleStartSetup() {
     //start of battle
-    image(fightBackground, 0, 0, canvasWidth, canvasHeight);
-
     damageMultiplier = 100;
     accuracyMultiplier = 100;
 
@@ -831,7 +831,7 @@ function skillBox() {
                     mouseIsPressed = false;
                     whichSKill = counter;
 
-                    if (characterCurrentMana > skillStat[whichSKill][0] || whichSKill == 2) {
+                    if (characterCurrentMana >= skillStat[whichSKill][0] || whichSKill == 2) {
                         skillFunction[whichSKill]();
 
                         if (bellyDrumFail) {
@@ -880,6 +880,7 @@ function useFireball() {
     enemyCurrentHealth -= damage;
     characterCurrentMana -= skillStat[whichSKill][0];
 
+    image(fightBackground, 0, 0, canvasWidth, canvasHeight);
     bottomBox();
     fill("#000000");
     textAlign(CENTER, CENTER);
@@ -894,6 +895,7 @@ function useLightFoot() {
     accuracyDecrease -= skillStat[whichSKill][1];
     characterCurrentMana -= skillStat[whichSKill][0];
 
+    image(fightBackground, 0, 0, canvasWidth, canvasHeight);
     bottomBox();
     fill("#000000");
     textAlign(CENTER, CENTER);
@@ -910,6 +912,7 @@ function useBellyDrum() {
     if (characterCurrentHealth > characterHealth*0.5) {
         characterCurrentHealth -= characterHealth*0.5;
 
+        image(fightBackground, 0, 0, canvasWidth, canvasHeight);
         bottomBox();
         fill("#000000");
         textAlign(CENTER, CENTER);
@@ -938,6 +941,7 @@ function useExplosion() {
     enemyCurrentHealth -= damage;
     characterCurrentMana -= skillStat[whichSKill][0];
 
+    image(fightBackground, 0, 0, canvasWidth, canvasHeight);
     bottomBox();
     fill("#000000");
     textAlign(CENTER, CENTER);
