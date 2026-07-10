@@ -1,6 +1,8 @@
 # Technoskill-2026
-Nama: 
-Tobias Sutanto
+Nama: Tobias Sutanto
+
+Link file exe: https://drive.google.com/drive/folders/1Qz3Ri9lrbHVup3Ew-HT09GWvg8i-iTTV?usp=sharing
+dalam zip itu, ada file .exe yang bisa dijalankan
 
 **Konsep**:
 Game dungeon-crawler dengan konsep turn-based combat. Poin didapat dari mengalahkan musuh.
