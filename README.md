@@ -65,3 +65,6 @@ run: kabur dari musuh dan tidak akan memberikan apa-apa
 
 **Bagian yang paling sulit**
 Dalam mode adventure, musuh akan spawn setiap 5 detik dengan maksimal 5 musuh. Fitur paling sulit dalam projek ini adalah masing-masing musuh yang spawn harus bisa memiliki pergerakan, stats, dan id masing-masing. Saya menyelesaikan bagian ini dengan cara membuat array kosong yang berisi koordinat, diameter, dan id serta data lainnya yang unik oleh setiap jenis musuh.
+
+**Reference**
+https://p5js.org/reference/
